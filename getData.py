@@ -1,23 +1,27 @@
 import numpy as np
 
-def normal(loc: np.ndarray, scale: float, shape: tuple[int,int]) -> np.ndarray:
+
+def normal(loc: np.ndarray, scale: float,
+           shape: tuple[int, int]) -> np.ndarray:
     x = np.random.normal(0, scale, shape)
     x[0, :] += loc[0]
     return x
 
-def gen_dataset(size: int, st_pos: tuple[float, float], n_classes : float, spasing : float, scale: float):
+
+def gen_dataset(size: int, st_pos: tuple[float, float], n_classes: float,
+                spasing: float, scale: float):
     x1_class_pos = np.ones((n_classes, 1)) * st_pos[0]
     x2_class_pos = np.ones((n_classes, 1)) * st_pos[1]
 
     if (n_classes >= 2):
         x1_class_pos[1] += spasing
-    
+
     if (n_classes >= 3):
         x2_class_pos[2] += spasing
 
     if (n_classes == 3):
-        x1_class_pos[2] += spasing / 2       
-    
+        x1_class_pos[2] += spasing / 2
+
     if (n_classes >= 4):
         x1_class_pos[3] += spasing
         x2_class_pos[3] += spasing

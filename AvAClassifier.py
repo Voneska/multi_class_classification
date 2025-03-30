@@ -4,17 +4,15 @@ import numpy as np
 class AvAClassifier:
     def __init__(self, feature_num: int, class_num: float, type: float):
         # type - 0 -> Linear, 1 -> SWM, 2 -> Logistic
-        
         self.__class_num: float = class_num
 
-        n_classifiers : int = int(class_num * (class_num - 1) / 2)
+        n_classifiers: int = int(class_num * (class_num - 1) / 2)
 
         # define width with bias
         self.__weights: np.ndarray = \
             np.random.normal(0, 1, (feature_num + 1, n_classifiers))
-        
+
         self.__type: float = type
-        
 
     # cals y_est -> <w,x>
     def __forward(self, x: np.ndarray, class_ind: float) -> np.ndarray:
@@ -37,8 +35,11 @@ class AvAClassifier:
             # train 4 classifiers
             for class1_ind in range(self.__class_num):
                 for class2_ind in range(class1_ind + 1, self.__class_num):
-                    valid_classes = (y_reference == class1_ind) | (y_reference == class2_ind)
+                    # find indexes for needed classes
+                    valid_classes = (y_reference == class1_ind) | \
+                        (y_reference == class2_ind)
 
+                    # take data for needed classes
                     x_taken = x_padded[:, valid_classes]
                     y_taken = y_reference[valid_classes]
 
@@ -84,7 +85,9 @@ class AvAClassifier:
         w_ind = 0
         for class1_ind in range(self.__class_num):
             for class2_ind in range(class1_ind + 1, self.__class_num):
-                y_est[:, w_ind] = np.where(self.__forward(x, w_ind) > 0, class1_ind, class2_ind)
+                y_est[:, w_ind] = np.where(self.__forward(x, w_ind) > 0,
+                                           class1_ind, class2_ind)
+
                 w_ind = w_ind + 1
         y_pred = np.apply_along_axis(self.__find_class, axis=1, arr=y_est)
 
@@ -92,10 +95,9 @@ class AvAClassifier:
 
     def __find_class(self, y):
         unique_elements, counts = np.unique(y, return_counts=True)
-        # return unique_elements[np.argmax(counts)]
         max_count = np.max(counts)
         most_frequent = unique_elements[counts == max_count]
-        return most_frequent[0] if len(most_frequent) == 1 else None 
+        return most_frequent[0] if len(most_frequent) == 1 else None
 
     # getter for weights
     @property
